@@ -5,24 +5,31 @@ import (
   "net/http"
 )
 
-type Alpha struct {
-  Request   *Request
-}
-
 type Address struct {
   Port      string
   Hostname  string
 }
 
+type Alpha struct {
+  Request   *Request
+  Response  *Response
+}
+
 func (a *Alpha) init() {}
 
 func (a *Alpha) handle() http.HandlerFunc {
-  request := a.Request
+  req := a.Request
+  res := a.Response
+
   return func (w http.ResponseWriter, r *http.Request) {
-    r.ParseForm()
-    request.In = r
-    request.Query = r.Form
-    w.Write([]byte("Hello alpha."))
+    req.In = r
+    res.Out = w
+
+    req.Query = r.URL.Query()
+    res.Headers = w.Header()
+
+    res.SetHeader("X-Powered-By", "Alpha")
+    res.SendString("Hello Web!");
   }
 }
 
