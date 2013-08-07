@@ -7,6 +7,7 @@ import (
 
 func main () {
   app := CreateApplication()
+  app.Listen(":3000")
   a := reflect.ValueOf(app)
   fmt.Println(a.Type())
 }
