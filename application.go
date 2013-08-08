@@ -31,7 +31,7 @@ func (a *Alpha) handle() http.HandlerFunc {
     // test
     res.Type("html")
     res.SetHeader("X-Powered-By", "Alpha")
-    res.SendString("Hello Web!");
+    res.Send("Hello Web!");
   }
 }
 

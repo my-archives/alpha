@@ -16,8 +16,70 @@ func (res *Response) Status(code int) *Response {
   return res
 }
 
+func (res *Response) SendByte(body []byte) *Response {
+  res.Out.Write(body)
+  return res
+}
+
 func (res *Response) SendString(body string) *Response {
   res.Out.Write([]byte(body))
+  return res
+}
+
+/**
+ *  Send a response.
+ *
+ *  Examples:
+ *
+ *    res.Send("<p>some html</p>")
+ *    res.Send([]byte("hello"))
+ *    res.Send(404, "Sorry, cant find taht")
+ *    res.Send(404)
+ *
+ */
+
+func (res *Response) Send(args ...interface{}) *Response {
+  var (
+    c, b interface{}
+    l int
+    body string
+    code = -1
+  )
+
+  l = len(args)
+  switch {
+  case l == 0:
+    body = ""
+  case l == 1:
+    c = args[0]
+  case l > 1:
+    c = args[0]
+    b = args[1]
+  }
+
+  switch v := c.(type) {
+  case int:
+    code = v
+    body = http.StatusText(code)
+  case string:
+    body = v
+  case []byte:
+    body = string(v)
+  }
+
+  if l > 1 {
+    switch v := b.(type) {
+    case string:
+      body = v
+    case []byte:
+      body = string(v)
+    }
+  }
+
+  if code != -1 {
+    res.Status(code)
+  }
+  res.SendString(body)
   return res
 }
 
@@ -41,10 +103,6 @@ func (res *Response) Type(t string) *Response {
 
 func (res *Response) ContentType(t string) *Response {
   return res.Type(t)
-}
-
-func (res *Response) Send() *Response {
-  return res
 }
 
 func (res *Response) SetHeader(field string, val string) *Response {
