@@ -28,6 +28,8 @@ func (a *Alpha) handle() http.HandlerFunc {
     req.Query = r.URL.Query()
     res.Headers = w.Header()
 
+    // test
+    res.Type("html")
     res.SetHeader("X-Powered-By", "Alpha")
     res.SendString("Hello Web!");
   }

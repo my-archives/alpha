@@ -3,6 +3,8 @@ package alpha
 import (
   "log"
   "io"
+  "mime"
+  "strings"
   "net/http"
 )
 
@@ -21,6 +23,28 @@ func (res *Response) SendString(body string) *Response {
     log.Fatal(err)
   }
   return res
+}
+
+func (res *Response) Type(t string) *Response {
+  if t == "" {
+    return res
+  }
+
+  field := "Content-Type"
+  t = strings.ToLower(t)
+
+  if ^strings.Index(t, "/") == 0 {
+    if '.' != t[0] {
+      t = "." + t
+    }
+    t = mime.TypeByExtension(t)
+  }
+
+  return res.SetHeader(field, t)
+}
+
+func (res *Response) ContentType(t string) *Response {
+  return res.Type(t)
 }
 
 func (res *Response) Send() *Response {
