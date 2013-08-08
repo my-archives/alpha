@@ -27,16 +27,16 @@ func (res *Response) Type(t string) *Response {
   }
 
   field := "Content-Type"
-  t = strings.ToLower(t)
+  val := strings.ToLower(t)
 
-  if ^strings.Index(t, "/") == 0 {
-    if '.' != t[0] {
-      t = "." + t
+  if ^strings.Index(val, "/") == 0 {
+    if !strings.HasPrefix(val, ".") {
+      val = "." + val
     }
-    t = mime.TypeByExtension(t)
+    val = mime.TypeByExtension(val)
   }
 
-  return res.SetHeader(field, t)
+  return res.SetHeader(field, val)
 }
 
 func (res *Response) ContentType(t string) *Response {
