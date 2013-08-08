@@ -1,8 +1,6 @@
 package alpha
 
 import (
-  "log"
-  "io"
   "mime"
   "strings"
   "net/http"
@@ -19,9 +17,7 @@ func (res *Response) Status(code int) *Response {
 }
 
 func (res *Response) SendString(body string) *Response {
-  if _, err := io.WriteString(res.Out, body); err != nil {
-    log.Fatal(err)
-  }
+  res.Out.Write([]byte(body))
   return res
 }
 
