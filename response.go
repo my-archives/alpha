@@ -3,12 +3,19 @@ package alpha
 import (
   "mime"
   "strings"
+  //"encoding/json"
   "net/http"
+)
+
+const (
+  Charset = "UTF-8"
 )
 
 type Response struct {
   Out       http.ResponseWriter
+  Req       *Request
   Headers   http.Header
+  Charset   string
 }
 
 func (res *Response) Status(code int) *Response {
@@ -26,17 +33,17 @@ func (res *Response) SendString(body string) *Response {
   return res
 }
 
-/**
- *  Send a response.
- *
- *  Examples:
- *
- *    res.Send("<p>some html</p>")
- *    res.Send([]byte("hello"))
- *    res.Send(404, "Sorry, cant find taht")
- *    res.Send(404)
- *
- */
+//
+//  Send a response.
+//
+//  Examples:
+//
+//    res.Send("<p>some html</p>")
+//    res.Send([]byte("hello"))
+//    res.Send(404, "Sorry, cant find taht")
+//    res.Send(404)
+//
+//
 
 func (res *Response) Send(args ...interface{}) *Response {
   var (
@@ -44,6 +51,7 @@ func (res *Response) Send(args ...interface{}) *Response {
     l int
     body string
     code = -1
+    isString = true
   )
 
   l = len(args)
@@ -79,7 +87,20 @@ func (res *Response) Send(args ...interface{}) *Response {
   if code != -1 {
     res.Status(code)
   }
-  res.SendString(body)
+
+  if isString {
+    if res.Charset == "" {
+      res.Charset = Charset
+    }
+    res.Type("html")
+    res.SendString(body)
+  }
+
+  return res
+}
+
+func (res *Response) JSON() *Response {
+  //res.Set("Content-Type", "application/json")
   return res
 }
 
@@ -106,6 +127,10 @@ func (res *Response) ContentType(t string) *Response {
 }
 
 func (res *Response) SetHeader(field string, val string) *Response {
+  field = strings.Title(strings.ToLower(field))
+  if "Content-Type" == field && ^strings.Index(val, "charset") == 0 && res.Charset != "" {
+    val += "; charset=" + res.Charset
+  }
   res.Headers.Set(field, val)
   return res
 }
@@ -113,3 +138,16 @@ func (res *Response) SetHeader(field string, val string) *Response {
 func (res *Response) Set() *Response {
   return res
 }
+
+func (res *Response) Get(field string) string {
+  return res.Headers.Get(field)
+}
+
+func (res *Response) Location(url string) *Response {
+  res.SetHeader("Location", url)
+  return res
+}
+
+func (res *Response) RedirectToUrl(url string) {}
+
+func (res *Response) Redirect(status int, url string) {}

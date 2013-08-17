@@ -10,12 +10,18 @@ type Address struct {
   Hostname  string
 }
 
+type HashObject map[string]interface{}
+
 type Alpha struct {
   Request   *Request
   Response  *Response
+
+  Settings  HashObject
 }
 
-func (a *Alpha) init() {}
+func (a *Alpha) init() {
+  a.Settings = HashObject{}
+}
 
 func (a *Alpha) handle() http.HandlerFunc {
   req := a.Request
@@ -24,14 +30,18 @@ func (a *Alpha) handle() http.HandlerFunc {
   return func (w http.ResponseWriter, r *http.Request) {
     req.In = r
     res.Out = w
+    req.Res = res
+    res.Req = req
 
     req.Query = r.URL.Query()
+    req.Headers = r.Header
     res.Headers = w.Header()
 
     // test
+    res.Charset = "UTF-8"
     res.Type("html")
-    res.SetHeader("X-Powered-By", "Alpha")
-    res.Send("Hello Web!");
+    res.SetHeader("X-pOWEREd-BY", "Alpha")
+    res.Send("Hello " + req.Get("User-Agent"));
   }
 }
 
