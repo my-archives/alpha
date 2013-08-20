@@ -40,7 +40,7 @@ func (a *Alpha) handle() http.HandlerFunc {
     // test
     res.Charset = "UTF-8"
     res.Type("html")
-    res.SetHeader("X-pOWEREd-BY", "Alpha")
+    res.SetHeader("X-Powered-By", "Alpha")
     res.Send("Hello " + req.Get("User-Agent"));
   }
 }
