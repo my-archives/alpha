@@ -87,3 +87,7 @@ func (req *Request) Xhr() bool {
   val := req.get("X-Requested-With")
   return val != "" && "xmlhttprequest" == strings.ToLower(val)
 }
+
+func (req *Request) Path() string {
+  return req.In.URL.Path
+}
