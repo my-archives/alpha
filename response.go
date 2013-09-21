@@ -12,14 +12,22 @@ const (
 )
 
 type Response struct {
-  Out       http.ResponseWriter
-  Req       *Request
-  Headers   http.Header
-  Charset   string
+  Out         http.ResponseWriter
+  Req         *Request
+  Headers     http.Header
+  Charset     string
+  StatusCode  int
+}
+
+func (res *Response) Override(w http.ResponseWriter) *Response {
+  res.Out = w
+  res.Headers = w.Header()
+  return res
 }
 
 func (res *Response) Status(code int) *Response {
   res.Out.WriteHeader(code)
+  res.StatusCode = code
   return res
 }
 
